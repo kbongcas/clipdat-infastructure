@@ -1,0 +1,153 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environmentName": {
+            "type": "String"
+        },
+        "cosmosDbConnectionString": {
+            "defaultValue": "",
+            "type": "String"
+        },
+        "cosmosDbCosmosDbId": {
+            "defaultValue": "",
+            "type": "String"
+        },
+        "cosmosDbUsersContainerId": {
+            "defaultValue": "",
+            "type": "String"
+        }
+    },
+    "variables": {
+        "logAnalyticsWorkspaceName": "[concat('logs-', parameters('environmentName'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "apiVersion": "2020-03-01-preview",
+            "name": "[variables('logAnalyticsWorkspaceName')]",
+            "location": "eastus",
+            "properties": {
+                "retentionInDays": 30,
+                "features": {
+                    "searchVersion": 1
+                },
+                "sku": {
+                    "name": "PerGB2018"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.App/managedEnvironments",
+            "apiVersion": "2022-03-01",
+            "name": "[parameters('environmentName')]",
+            "location": "eastus",
+            "properties": {
+                 "appLogsConfiguration":{
+                    "destination": "log-analytics",
+                    "logAnalyticsConfiguration": {
+                        "customerId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsWorkspaceName')), '2020-03-01-preview').customerId]",
+                        "sharedKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsWorkspaceName')), '2020-03-01-preview').primarySharedKey]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "clipsservice",
+            "type": "Microsoft.App/containerApps",
+            "apiVersion": "2022-03-01",
+            "kind": "containerapp",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.App/managedEnvironments', parameters('environmentName'))]"
+            ],
+            "properties": {
+                "managedEnvironmentId": "[resourceId('Microsoft.App/managedEnvironments', parameters('environmentName'))]",
+                "configuration": {
+                    "activeRevisionsMode": "single",
+                    "secrets": [
+                        {
+                            "name": "dbconnection",
+                            "value": "[parameters('cosmosDbConnectionString')]"
+                        },
+                        {
+                            "name": "domain",
+                            "value": "defaultdomain"
+                        },
+                        {
+                            "name": "audience",
+                            "value": "defaultAudience"
+                        },
+                        {
+                            "name": "dbid",
+                            "value": "[parameters('cosmosDbCosmosDbId')]"
+                        },
+                        {
+                            "name": "containerid",
+                            "value": "[parameters('cosmosDbUsersContainerId')]"
+                        }
+                    ],
+                    "ingress": {
+                        "external": true,
+                        "targetPort": 80,
+                        "allowInsecure": false,
+                        "traffic": [
+                            {
+                                "latestRevision": true,
+                                "weight": 100
+                            }
+                        ]
+                    }
+                },
+                "template": {
+                    "containers": [
+                        {
+                            "image": "kbongcas/clipdat-clipsservice:latest",
+                            "name": "clipconverter",
+                            "resources": {
+                                "cpu": 0.25,
+                                "memory": "0.5Gi"
+                            },
+                            "env": [
+                                {
+                                    "name": "CosmosDbConnectionString",
+                                    "secretref": "dbconnection"
+                                },
+                                {
+                                    "name": "Auth0Domain",
+                                    "secretRef": "domain"
+                                },
+                                {
+                                    "name": "Auth0Audience",
+                                    "secretRef": "audience"
+                                },
+                                {
+                                    "name": "CosmosDbCosmosDbId",
+                                    "secretRef": "dbid"
+                                },
+                                {
+                                    "name": "CosmosDbUsersContainerId",
+                                    "secretRef": "containerid"
+                                }
+                            ]
+                        }
+                    ],
+                    "scale": {
+                        "minReplicas": 0,
+                        "maxReplicas": 5,
+                        "rules": [
+                            {
+                                "name": "http-rule",
+                                "http": {
+                                    "metadata": {
+                                        "concurrentRequests": "100"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

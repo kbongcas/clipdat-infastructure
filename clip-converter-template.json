@@ -1,0 +1,121 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "environmentName": {
+            "type": "String"
+        },
+        "queueConnection": {
+            "defaultValue": "",
+            "type": "String"
+        },
+        "queueName": {
+            "defaultValue": "",
+            "type": "String"
+        },
+        "storageAccountName": {
+            "defaultValue": "",
+            "type": "String"
+        }
+    },
+    "variables": {
+        "logAnalyticsWorkspaceName": "[concat('logs-', parameters('environmentName'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "apiVersion": "2020-03-01-preview",
+            "name": "[variables('logAnalyticsWorkspaceName')]",
+            "location": "eastus",
+            "properties": {
+                "retentionInDays": 30,
+                "features": {
+                    "searchVersion": 1
+                },
+                "sku": {
+                    "name": "PerGB2018"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.App/managedEnvironments",
+            "apiVersion": "2022-03-01",
+            "name": "[parameters('environmentName')]",
+            "location": "eastus",
+            "properties": {
+                 "appLogsConfiguration":{
+                    "destination": "log-analytics",
+                    "logAnalyticsConfiguration": {
+                        "customerId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsWorkspaceName')), '2020-03-01-preview').customerId]",
+                        "sharedKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsWorkspaceName')), '2020-03-01-preview').primarySharedKey]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "clipconverter",
+            "type": "Microsoft.App/containerApps",
+            "apiVersion": "2022-03-01",
+            "kind": "containerapp",
+            "location": "East US",
+            "dependsOn": [
+                "[resourceId('Microsoft.App/managedEnvironments', parameters('environmentName'))]"
+            ],
+            "properties": {
+                "managedEnvironmentId": "[resourceId('Microsoft.App/managedEnvironments', parameters('environmentName'))]",
+                "configuration": {
+                    "activeRevisionsMode": "single",
+                    "secrets": [
+                        {
+                            "name": "queueconnection",
+                            "value": "[parameters('queueConnection')]"
+                        }
+                    ]
+                },
+                "template": {
+                    "containers": [
+                        {
+                            "image": "kbongcas/clipdat-clipconverter:latest",
+                            "name": "clipconverter",
+                            "resources": {
+                                "cpu": 1,
+                                "memory": "2Gi"
+                            },
+                            "env": [
+                                {
+                                    "name": "AzureStorageConnectionString",
+                                    "secretref": "queueconnection"
+                                }
+                            ]
+                        }
+                    ],
+                     "scale": {
+                        "minReplicas": 0,
+                        "maxReplicas": 5,
+                        "coolDownPeriod": 100,
+                        "rules": [
+                            {
+                                "name": "storage-queue-based-autoscaling",
+                                "custom": {
+                                    "type": "azure-queue",
+                                    "metadata": {
+                                        "queueName": "[parameters('queueName')]",
+                                        "queueLength": "1",
+                                        "accountName": "[parameters('storageAccountName')]",
+                                        "cloud":"AzurePublicCloud"
+                                    },
+                                    "auth": [
+                                        {
+                                            "secretRef": "queueconnection",
+                                            "triggerParameter": "connection"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
