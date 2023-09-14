@@ -16,6 +16,10 @@
         "blobContainerName": {
             "defaultValue": "",
             "type": "String"
+        },
+        "clipsServiceEndpoint": {
+            "defaultValue": "",
+            "type": "String"
         }
     },
     "variables": {
@@ -91,16 +95,16 @@
                             "value": "defaulttokenEndpoint"
                         },
                         {
-                            "name": "clipsserviceendpoint",
-                            "value": "defaultClipsServiceEndpoint"
-                        },
-                        {
                             "name": "blobcontainername",
                             "value": "[parameters('blobContainerName')]"
                         },
                         {
                             "name": "queuename",
                             "value": "[parameters('queueName')]"
+                        },
+                        {
+                            "name": "clipsserviceendpoint",
+                            "value": "[parameters('clipsServiceEndpoint')]"
                         }
                     ],
                     "ingress": {

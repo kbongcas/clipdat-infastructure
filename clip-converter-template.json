@@ -16,6 +16,10 @@
         "storageAccountName": {
             "defaultValue": "",
             "type": "String"
+        },
+        "clipsServiceEndpoint": {
+            "defaultValue": "",
+            "type": "String"
         }
     },
     "variables": {
@@ -43,7 +47,7 @@
             "name": "[parameters('environmentName')]",
             "location": "eastus",
             "properties": {
-                 "appLogsConfiguration":{
+                "appLogsConfiguration": {
                     "destination": "log-analytics",
                     "logAnalyticsConfiguration": {
                         "customerId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces/', variables('logAnalyticsWorkspaceName')), '2020-03-01-preview').customerId]",
@@ -69,6 +73,34 @@
                         {
                             "name": "queueconnection",
                             "value": "[parameters('queueConnection')]"
+                        },
+                        {
+                            "name": "clientid",
+                            "value": "defaultValue"
+                        },
+                        {
+                            "name": "clientsecret",
+                            "value": "defaultValue"
+                        },
+                        {
+                            "name": "domain",
+                            "value": "defaultValue"
+                        },
+                        {
+                            "name": "audience",
+                            "value": "defaultValue"
+                        },
+                        {
+                            "name": "tokenendpoint",
+                            "value": "defaultValue"
+                        },
+                        {
+                            "name": "tokenendpoint",
+                            "value": "defaultValue"
+                        },
+                        {
+                            "name": "clipsserviceendpoint",
+                            "value": "[parameters('clipsServiceEndpoint')]"
                         }
                     ]
                 },
@@ -85,11 +117,35 @@
                                 {
                                     "name": "AzureStorageConnectionString",
                                     "secretref": "queueconnection"
+                                },
+                                {
+                                    "name": "Auth0ClientId",
+                                    "secretref": "clientid"
+                                },
+                                {
+                                    "name": "Auth0ClientSecret",
+                                    "secretref": "clientsecret"
+                                },
+                                {
+                                    "name": "Auth0Domain",
+                                    "secretref": "domain"
+                                },
+                                {
+                                    "name": "Auth0Audience",
+                                    "secretref": "audience"
+                                },
+                                {
+                                    "name": "Auth0Audience",
+                                    "secretref": "tokenendpoint"
+                                },
+                                {
+                                    "name": "ClipsServiceEndpoint",
+                                    "secretref": "clipsserviceendpoint"
                                 }
                             ]
                         }
                     ],
-                     "scale": {
+                    "scale": {
                         "minReplicas": 0,
                         "maxReplicas": 5,
                         "coolDownPeriod": 100,
@@ -102,7 +158,7 @@
                                         "queueName": "[parameters('queueName')]",
                                         "queueLength": "1",
                                         "accountName": "[parameters('storageAccountName')]",
-                                        "cloud":"AzurePublicCloud"
+                                        "cloud": "AzurePublicCloud"
                                     },
                                     "auth": [
                                         {

@@ -16,6 +16,14 @@
         "cosmosDbUsersContainerId": {
             "defaultValue": "",
             "type": "String"
+        },
+        "blobDbConnection": {
+            "defaultValue": "",
+            "type": "String"
+        },
+        "convertedContainerName": {
+            "defaultValue": "",
+            "type": "String"
         }
     },
     "variables": {
@@ -85,6 +93,14 @@
                         {
                             "name": "containerid",
                             "value": "[parameters('cosmosDbUsersContainerId')]"
+                        },
+                        {
+                            "name": "blobdbconnection",
+                            "value": "[parameters('blobDbConnection')]"
+                        },
+                        {
+                            "name": "convertedcontainername",
+                            "value": "[parameters('convertedContainerName')]"
                         }
                     ],
                     "ingress": {
@@ -103,7 +119,7 @@
                     "containers": [
                         {
                             "image": "kbongcas/clipdat-clipsservice:latest",
-                            "name": "clipconverter",
+                            "name": "clipsservice",
                             "resources": {
                                 "cpu": 0.25,
                                 "memory": "0.5Gi"
@@ -128,6 +144,14 @@
                                 {
                                     "name": "CosmosDbUsersContainerId",
                                     "secretRef": "containerid"
+                                },
+                                {
+                                    "name": "AzureStorageConnectionString",
+                                    "secretRef": "blobdbconnection"
+                                },
+                                {
+                                    "name": "ConvertedContainerName",
+                                    "secretRef": "convertedcontainername"
                                 }
                             ]
                         }
