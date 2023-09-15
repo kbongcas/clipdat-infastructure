@@ -1,13 +1,13 @@
-RESOURCE_GROUP="clipdat" #change this in master
+RESOURCE_GROUP="clipdat-dev" #change this in master
 LOCATION="eastus"
-STORAGE_ACCOUNT="clipdatsa" #change this in master
-COSMOSDB_ACCOUNT="clipdatcsmdba"
+STORAGE_ACCOUNT="clipdatsadev" #change this in master
+COSMOSDB_ACCOUNT="clipdatcsmdbadev"
 COSMOSDB_NAME="clipdatcsmdb"
 COSMOSDB_CONTAINER="clips"
 QUEUE_NAME="clips"
 BLOBCON_CLIPS_NAME="clips"
 BLOBCON_CONVERTED_NAME="converted"
-ENV_NAME="clipdat-env"
+ENV_NAME="clipdat-dev-env"
 
 # creating resource group
 az group create \
