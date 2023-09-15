@@ -6,7 +6,7 @@ COSMOSDB_NAME="clipdatcsmdb"
 COSMOSDB_CONTAINER="clips"
 QUEUE_NAME="clips"
 BLOBCON_CLIPS_NAME="clips"
-BLOBCON_CONVERTED_NAME="clips"
+BLOBCON_CONVERTED_NAME="converted"
 ENV_NAME="clipdat-env"
 
 # creating resource group
