@@ -142,7 +142,7 @@
                                     "secretRef": "dbid"
                                 },
                                 {
-                                    "name": "CosmosDbUsersContainerId",
+                                    "name": "CosmosDbClipsContainerId",
                                     "secretRef": "containerid"
                                 },
                                 {
