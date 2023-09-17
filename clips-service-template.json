@@ -118,7 +118,7 @@
                 "template": {
                     "containers": [
                         {
-                            "image": "kbongcas/clipdat-clipsservice:latest",
+                            "image": "kbongcas/clipdat-clipsservice:dev",
                             "name": "clipsservice",
                             "resources": {
                                 "cpu": 0.25,

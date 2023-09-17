@@ -107,7 +107,7 @@
                 "template": {
                     "containers": [
                         {
-                            "image": "kbongcas/clipdat-clipconverter:latest",
+                            "image": "kbongcas/clipdat-clipconverter:dev",
                             "name": "clipconverter",
                             "resources": {
                                 "cpu": 1,

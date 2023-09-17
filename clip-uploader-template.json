@@ -122,7 +122,7 @@
                 "template": {
                     "containers": [
                         {
-                            "image": "kbongcas/clipdat-clipuploader:latest",
+                            "image": "kbongcas/clipdat-clipuploader:dev",
                             "name": "clipuploader",
                             "resources": {
                                 "cpu": 0.5,
