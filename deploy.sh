@@ -95,11 +95,13 @@ az deployment group create \
      --parameters blobDbConnection=$AZ_STORAGE_CON \
      --parameters convertedContainerName=$BLOBCON_CONVERTED_NAME
 
-CLIPS_SERVICE_ENDPOINT=$(az containerapp ingress show \
+CLIPS_SERVICE_ENDPOINT="https://"
+CLIPS_SERVICE_ENDPOINT+=$(az containerapp ingress show \
          -g $RESOURCE_GROUP \
          -n clipsservice \
          --query fqdn \
          --output tsv)
+CLIPS_SERVICE_ENDPOINT="/users"
 
 # deploy converter using template
 az deployment group create \
