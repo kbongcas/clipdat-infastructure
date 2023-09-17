@@ -135,7 +135,7 @@
                                     "secretref": "audience"
                                 },
                                 {
-                                    "name": "Auth0Audience",
+                                    "name": "Auth0TokenEndpoint",
                                     "secretref": "tokenendpoint"
                                 },
                                 {
